@@ -45,7 +45,7 @@ class OrderServiceTest {
     void getAllOrders_returnsAllOrders() {
         when(orderRepository.findAll()).thenReturn(Arrays.asList(testOrder));
         List<Order> orders = orderService.getAllOrders();
-        assertThat(orders).hasSize(1);
+        assertThat(orders).hasSize(2);
         assertThat(orders.get(0).getCustomerName()).isEqualTo("John Doe");
     }
 
@@ -102,6 +102,15 @@ class OrderServiceTest {
 
         Order updated = orderService.updateOrderStatus(1L, "CANCELLED");
         assertThat(updated.getStatus()).isEqualTo("CANCELLED");
+    }
+
+    @Test
+    void updateOrderStatus_orderNotFound_throwsException() {
+        when(orderRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.updateOrderStatus(99L, "CONFIRMED"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Order not found: 99");
     }
 
     @Test

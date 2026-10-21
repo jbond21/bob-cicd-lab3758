@@ -130,8 +130,60 @@ spec:
         }
 
         // ── Lab 2: Unit Testing ──────────────────────────────────
-        //    Add a mvn test stage + Bob test-failure analysis.
-        //    See labs/lab2/UNIT_TESTING.md.
+        stage('Unit Tests') {
+            options {
+                timeout(time: 10, unit: 'MINUTES')
+            }
+            steps {
+                script {
+                    // Run tests; || true keeps the stage alive so we can publish
+                    // results and run Bob analysis regardless of outcome.
+                    def mvnResult = sh(
+                        script: 'mvn -f order-service/pom.xml test -B 2>&1 | tee order-service/mvn-test.log; exit ${PIPESTATUS[0]}',
+                        returnStatus: true
+                    )
+
+                    // Always publish JUnit results (even on failure)
+                    junit testResults: 'order-service/target/surefire-reports/*.xml',
+                          allowEmptyResults: true
+
+                    // Only invoke Bob when tests actually failed
+                    if (mvnResult != 0) {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            def prompt = """\
+You are analyzing a Maven Surefire test run that reported failures.
+
+Read the XML reports under order-service/target/surefire-reports/ to identify \
+every failing test method, then read the relevant source files under \
+order-service/src/ to understand the production code and the test code involved.
+
+For each failure provide:
+1. Test class and method name
+2. Failure type and message
+3. Root cause (one sentence)
+4. Suggested fix (code snippet if helpful)
+
+Group related failures together and end with a short prioritised action list."""
+
+                            def analysis = askBob(prompt, 'pipeline-test-failure-analyzer')
+
+                            echo '════════════════════════════════════════════════════════'
+                            echo '  Bob — Test Failure Analysis'
+                            echo '════════════════════════════════════════════════════════'
+                            echo analysis
+                            echo '════════════════════════════════════════════════════════'
+
+                            writeFile file: 'bob-test-analysis.md', text: analysis
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'bob-test-analysis.md', allowEmptyArchive: true
+                }
+            }
+        }
 
         // ── Lab 3: Security Scanning ─────────────────────────────
         //    Add a scanner stage + Bob CVE/vuln analysis.
