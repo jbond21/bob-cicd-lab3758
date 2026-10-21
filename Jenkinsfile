@@ -206,7 +206,7 @@ Group related failures together and end with a short prioritised action list."""
 
 // ── Helper: ask Bob, optionally with a specific custom mode ───────────────────
 // Writes the prompt to a tempfile in the shared workspace and runs `bob` in
-// the bob container, adding `--chat-mode <slug>` only when a mode is provided.
+// the bob container.
 // Returns the analysis as a string. Using a tempfile (instead of inlining the
 // prompt on the command line) avoids shell-escaping issues when the prompt
 // contains quotes, backticks, or newlines — common with diffs.
@@ -215,9 +215,9 @@ def askBob(String prompt, String mode = null) {
         def promptFile = ".bob-prompt-${System.currentTimeMillis()}.txt"
         writeFile file: promptFile, text: prompt
 
-        def modeFlag = mode ? "--chat-mode ${mode}" : ""
+        def modeFlag = mode ? "--mode ${mode}" : ""
         def analysis = sh(
-            script: """bob ${modeFlag} -p "\$(cat ${promptFile})" --hide-intermediary-output""",
+            script: """cat ${promptFile} | bob run ${modeFlag} --accept-license""",
             returnStdout: true
         ).trim()
 
