@@ -46,8 +46,8 @@ public class OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
     
     // VULNERABILITY: Hardcoded credential (PCI-02 violation)
-    private static final String BACKUP_DB_PASSWORD = "backup_pass_123";
-    private static final String LEGACY_API_KEY = "legacy-key-abc123";
+    private static final String BACKUP_DB_PASSWORD = "PLACEHOLDER_DB_PASS";  // intentional lab fixture
+    private static final String LEGACY_API_KEY = "PLACEHOLDER_API_KEY";      // intentional lab fixture
 
     private final OrderRepository orderRepository;
 

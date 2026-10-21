@@ -1,0 +1,393 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>SonarQube Analysis Report — Order Service</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.6; background: #ffffff; color: #1f2328; }
+  .page { max-width: 760px; margin: 0 auto; padding: 32px 24px 48px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: #57606a; font-size: 13px; margin-bottom: 28px; }
+  h2 { font-size: 15px; font-weight: 700; margin: 28px 0 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+  h3 { font-size: 13px; font-weight: 700; margin: 16px 0 6px; }
+  p { margin-bottom: 10px; }
+
+  /* Gate banner */
+  .gate { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 6px; border: 1px solid #bbf7d0; background: #f0fdf4; margin-bottom: 24px; }
+  .gate-badge { font-size: 13px; font-weight: 700; color: #166534; background: #dcfce7; padding: 3px 10px; border-radius: 99px; border: 1px solid #86efac; }
+  .gate-text { font-size: 13px; color: #166534; }
+
+  /* Metric cards */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; }
+  .metric { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; }
+  .metric .label { font-size: 11px; color: #57606a; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .metric .value { font-size: 22px; font-weight: 700; }
+  .metric .sub { font-size: 11px; color: #57606a; margin-top: 2px; }
+  .red { color: #dc2626; }
+  .orange { color: #ea580c; }
+  .green { color: #16a34a; }
+  .yellow { color: #ca8a04; }
+
+  /* Rating */
+  .ratings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 8px; }
+  .rating { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; }
+  .rating .label { font-size: 11px; color: #57606a; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .rating .grade { font-size: 28px; font-weight: 800; }
+  .grade-a { color: #16a34a; }
+  .grade-d { color: #dc2626; }
+
+  /* Issue table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: #f7f8fa; }
+  th { text-align: left; padding: 8px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #57606a; border-bottom: 2px solid #e5e7eb; }
+  td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+  .sev-critical { background: #fee2e2; color: #991b1b; }
+  .sev-major    { background: #ffedd5; color: #9a3412; }
+  .sev-minor    { background: #fef9c3; color: #854d0e; }
+  .type-bug     { background: #fce7f3; color: #9d174d; }
+  .type-smell   { background: #ede9fe; color: #5b21b6; }
+  .type-hotspot { background: #fff7ed; color: #c2410c; }
+
+  /* Hotspot table */
+  .hp-high   { background: #fee2e2; color: #991b1b; }
+  .hp-medium { background: #ffedd5; color: #9a3412; }
+  .hp-low    { background: #fef9c3; color: #854d0e; }
+
+  /* File breakdown */
+  .file-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+  .file-row:last-child { border-bottom: none; }
+  .file-name { font-family: "SF Mono", "Fira Code", monospace; font-size: 12px; }
+  .pill-row { display: flex; gap: 6px; }
+
+  /* Test summary */
+  .test-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .test-card { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 14px; }
+  .test-card .lbl { font-size: 11px; color: #57606a; text-transform: uppercase; }
+  .test-card .val { font-size: 20px; font-weight: 700; }
+
+  /* Recommendations */
+  .rec { padding: 10px 14px; border-left: 3px solid #3b82d4; background: #f7f8fa; border-radius: 0 4px 4px 0; margin-bottom: 8px; }
+  .rec strong { display: block; margin-bottom: 2px; }
+  .rec p { margin: 0; color: #57606a; font-size: 13px; }
+
+  /* Footer */
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #57606a; }
+  a { color: #3b82d4; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>SonarQube Analysis Report</h1>
+  <div class="subtitle">Project: <strong>order-service-jordanbond-1792604970</strong>  |  Scanned: 2026-10-21  |  Branch: user39-labs  |  305 lines of code (5 Java files)</div>
+
+  
+  <div class="gate">
+    <span class="gate-badge">PASSED</span>
+    <span class="gate-text">Quality Gate status: <strong>OK</strong> — project meets all defined quality thresholds.</span>
+  </div>
+
+  
+  <h2>Key Metrics at a Glance</h2>
+  <div class="metrics">
+    <div class="metric">
+      <div class="label">Bugs</div>
+      <div class="value red">2</div>
+      <div class="sub">10 min remediation effort</div>
+    </div>
+    <div class="metric">
+      <div class="label">Vulnerabilities</div>
+      <div class="value green">0</div>
+      <div class="sub">No known vulnerabilities</div>
+    </div>
+    <div class="metric">
+      <div class="label">Code Smells</div>
+      <div class="value orange">8</div>
+      <div class="sub">90 min technical debt</div>
+    </div>
+    <div class="metric">
+      <div class="label">Security Hotspots</div>
+      <div class="value yellow">5</div>
+      <div class="sub">All "To Review"</div>
+    </div>
+  </div>
+  <div class="metrics" style="margin-top:10px">
+    <div class="metric">
+      <div class="label">Coverage</div>
+      <div class="value red">0%</div>
+      <div class="sub">No JaCoCo report</div>
+    </div>
+    <div class="metric">
+      <div class="label">Duplication</div>
+      <div class="value green">0%</div>
+      <div class="sub">No duplicated lines</div>
+    </div>
+    <div class="metric">
+      <div class="label">Cyclomatic Complexity</div>
+      <div class="value">39</div>
+      <div class="sub">Cognitive: 9</div>
+    </div>
+    <div class="metric">
+      <div class="label">Lines of Code</div>
+      <div class="value">305</div>
+      <div class="sub">5 main source files</div>
+    </div>
+  </div>
+
+  
+  <h2>Quality Ratings</h2>
+  <div class="ratings">
+    <div class="rating">
+      <div class="label">Reliability</div>
+      <div class="grade grade-d">D</div>
+      <div class="sub" style="color:#dc2626;font-size:12px;margin-top:4px">Rating 4.0 — 2 Bugs</div>
+    </div>
+    <div class="rating">
+      <div class="label">Security</div>
+      <div class="grade grade-a">A</div>
+      <div class="sub" style="color:#16a34a;font-size:12px;margin-top:4px">Rating 1.0 — 0 Vulnerabilities</div>
+    </div>
+    <div class="rating">
+      <div class="label">Maintainability</div>
+      <div class="grade grade-a">A</div>
+      <div class="sub" style="color:#16a34a;font-size:12px;margin-top:4px">Rating 1.0 — 90 min debt</div>
+    </div>
+  </div>
+
+  
+  <h2>Unit Test Results</h2>
+  <div class="test-grid">
+    <div class="test-card">
+      <div class="lbl">Total Tests</div>
+      <div class="val">16</div>
+    </div>
+    <div class="test-card">
+      <div class="lbl">Passed</div>
+      <div class="val green">13</div>
+    </div>
+    <div class="test-card">
+      <div class="lbl">Failed</div>
+      <div class="val red">3</div>
+    </div>
+    <div class="test-card">
+      <div class="lbl">Skipped</div>
+      <div class="val">0</div>
+    </div>
+  </div>
+  <p style="margin-top:10px;font-size:13px;color:#57606a">
+    <strong>3 failing tests in <code>OrderServiceTest</code>:</strong><br />
+    • <code>getAllOrders_returnsAllOrders</code> — Expected 2 items, got 1 (likely a bug in <code>getAllOrders()</code>)<br />
+    • <code>updateOrderStatus_invalidTransition_throwsException</code> — No exception thrown on invalid transition<br />
+    • <code>updateOrderStatus_fromTerminalStatus_throwsException</code> — No exception thrown from terminal state
+  </p>
+
+  
+  <h2>Issues (10 Total)</h2>
+
+  <h3>🐛 Bugs (2 — Critical &amp; Minor)</h3>
+  <table>
+    <thead><tr><th>Severity</th><th>Rule</th><th>File</th><th>Line</th><th>Message</th><th>Effort</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge sev-critical">CRITICAL</span></td>
+        <td>S2119</td>
+        <td class="file-name">OrderService.java</td>
+        <td>116</td>
+        <td>Save and re-use this <code>Random</code> instance.</td>
+        <td>5 min</td>
+      </tr>
+      <tr>
+        <td><span class="badge sev-minor">MINOR</span></td>
+        <td>S2676</td>
+        <td class="file-name">OrderService.java</td>
+        <td>117</td>
+        <td>Use the original value instead (suspicious Math.abs on nextInt).</td>
+        <td>5 min</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:16px">🔧 Code Smells (8)</h3>
+  <table>
+    <thead><tr><th>Severity</th><th>Rule</th><th>File</th><th>Line</th><th>Message</th><th>Effort</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge sev-critical">CRITICAL</span></td>
+        <td>S1452</td>
+        <td class="file-name">OrderController.java</td>
+        <td>46</td>
+        <td>Remove usage of generic wildcard type (<code>ResponseEntity&lt;?&gt;</code>).</td>
+        <td>20 min</td>
+      </tr>
+      <tr>
+        <td><span class="badge sev-major">MAJOR</span></td>
+        <td>S1068</td>
+        <td class="file-name">OrderService.java</td>
+        <td>19</td>
+        <td>Remove unused private field <code>BACKUP_DB_PASSWORD</code>.</td>
+        <td>5 min</td>
+      </tr>
+      <tr>
+        <td><span class="badge sev-major">MAJOR</span></td>
+        <td>S106</td>
+        <td class="file-name">OrderService.java</td>
+        <td>47</td>
+        <td>Replace <code>System.out</code> with a logger.</td>
+        <td>10 min</td>
+      </tr>
+      <tr>
+        <td><span class="badge sev-major">MAJOR</span></td>
+        <td>S106</td>
+        <td class="file-name">OrderService.java</td>
+        <td>60</td>
+        <td>Replace <code>System.out</code> with a logger.</td>
+        <td>10 min</td>
+      </tr>
+      <tr>
+        <td><span class="badge sev-major">MAJOR</span></td>
+        <td>S106</td>
+        <td class="file-name">OrderService.java</td>
+        <td>82</td>
+        <td>Replace <code>System.out</code> with a logger.</td>
+        <td>10 min</td>
+      </tr>
+      <tr>
+        <td><span class="badge sev-major">MAJOR</span></td>
+        <td>S106</td>
+        <td class="file-name">OrderService.java</td>
+        <td>133</td>
+        <td>Replace <code>System.out</code> with a logger.</td>
+        <td>10 min</td>
+      </tr>
+      <tr>
+        <td><span class="badge sev-major">MAJOR</span></td>
+        <td>S1172</td>
+        <td class="file-name">OrderService.java</td>
+        <td>69</td>
+        <td>Remove unused method parameters <code>currentStatus</code>, <code>newStatus</code>.</td>
+        <td>5 min</td>
+      </tr>
+      <tr>
+        <td><span class="badge sev-major">MAJOR</span></td>
+        <td>S112</td>
+        <td class="file-name">OrderService.java</td>
+        <td>128</td>
+        <td>Define and throw a dedicated exception instead of generic <code>RuntimeException</code>.</td>
+        <td>20 min</td>
+      </tr>
+    </tbody>
+  </table>
+
+  
+  <h2>Security Hotspots (5 — All "To Review")</h2>
+  <table>
+    <thead><tr><th>Probability</th><th>Category</th><th>Line</th><th>Finding</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge hp-high">HIGH</span></td>
+        <td>Authentication</td>
+        <td>19</td>
+        <td><strong>Hard-coded password detected</strong> — field name <code>BACKUP_DB_PASSWORD</code> contains a potential credential. Rule: S2068.</td>
+      </tr>
+      <tr>
+        <td><span class="badge hp-medium">MEDIUM</span></td>
+        <td>Weak Cryptography</td>
+        <td>116</td>
+        <td><strong>Pseudorandom Number Generator (PRNG)</strong> — <code>java.util.Random</code> is not cryptographically secure. Rule: S2245.</td>
+      </tr>
+      <tr>
+        <td><span class="badge hp-low">LOW</span></td>
+        <td>Insecure Config</td>
+        <td>106</td>
+        <td><strong>Debug feature in production</strong> — debug flag left active. Rule: S4507.</td>
+      </tr>
+      <tr>
+        <td><span class="badge hp-low">LOW</span></td>
+        <td>Insecure Config</td>
+        <td>138</td>
+        <td><strong>Debug feature in production</strong> — debug flag left active. Rule: S4507.</td>
+      </tr>
+      <tr>
+        <td><span class="badge hp-low">LOW</span></td>
+        <td>Other / Hashing</td>
+        <td>92</td>
+        <td><strong>Weak hash algorithm</strong> — potentially insecure hashing in sensitive context. Rule: S4790.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  
+  <h2>File Breakdown</h2>
+  <div>
+    <div class="file-row">
+      <span class="file-name">OrderService.java</span>
+      <div class="pill-row">
+        <span class="badge type-bug">2 Bugs</span>
+        <span class="badge type-smell">7 Smells</span>
+        <span class="badge type-hotspot">5 Hotspots</span>
+      </div>
+    </div>
+    <div class="file-row">
+      <span class="file-name">OrderController.java</span>
+      <div class="pill-row">
+        <span class="badge type-smell">1 Smell</span>
+      </div>
+    </div>
+    <div class="file-row">
+      <span class="file-name">OrderApplication.java, Order.java, OrderRepository.java</span>
+      <div class="pill-row">
+        <span class="badge" style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0">Clean</span>
+      </div>
+    </div>
+  </div>
+
+  
+  <h2>Recommendations (Priority Order)</h2>
+
+  <div class="rec">
+    <strong>1. Fix the 3 failing unit tests</strong>
+    <p>The <code>OrderService</code> is missing validation logic for state transitions and <code>getAllOrders()</code> returns fewer records than expected. These are functional bugs — fix the service logic first.</p>
+  </div>
+  <div class="rec">
+    <strong>2. Investigate &amp; remove the hard-coded credential field (S2068 / line 19)</strong>
+    <p>The field <code>BACKUP_DB_PASSWORD</code> in <code>OrderService</code> is a HIGH-probability security hotspot. Credentials should never live in source code — move to environment variables or a secrets manager.</p>
+  </div>
+  <div class="rec">
+    <strong>3. Replace <code>java.util.Random</code> with <code>SecureRandom</code> (S2245 / line 116)</strong>
+    <p>If random values are used in any security-sensitive context, <code>java.util.Random</code> is predictable. Use <code>java.security.SecureRandom</code> instead. Also fix the re-instantiation bug (S2119).</p>
+  </div>
+  <div class="rec">
+    <strong>4. Replace all <code>System.out.println</code> calls with SLF4J logger (S106 / lines 47, 60, 82, 133)</strong>
+    <p>Four occurrences in <code>OrderService</code>. Replace with <code>private static final Logger log = LoggerFactory.getLogger(...)</code> and use <code>log.info()</code> / <code>log.debug()</code>.</p>
+  </div>
+  <div class="rec">
+    <strong>5. Disable debug flags before production deployment (S4507 / lines 106, 138)</strong>
+    <p>Two debug features found active. Guard them with a conditional check or remove them entirely from production code paths.</p>
+  </div>
+  <div class="rec">
+    <strong>6. Add JaCoCo to the Maven build for coverage reporting</strong>
+    <p>Coverage is reported as 0% because no JaCoCo XML report was found. Add the <code>jacoco-maven-plugin</code> to <code>pom.xml</code> so SonarQube can track test coverage on future scans.</p>
+  </div>
+  <div class="rec">
+    <strong>7. Address remaining code smells (S1452, S1172, S112, S1068)</strong>
+    <p>Remove wildcard return type in <code>OrderController</code>, remove unused parameters and the unused password field, and introduce a custom exception class instead of <code>RuntimeException</code>.</p>
+  </div>
+
+  
+  <h2>References</h2>
+  <p>
+    <a href="https://sonarqube-sonarqube.apps.itz-y6rg5f.infra01-lb.wdc07.techzone.ibm.com/dashboard?id=order-service-jordanbond-1792604970">SonarQube Dashboard →</a>
+     | 
+    <a href="https://sonarqube-sonarqube.apps.itz-y6rg5f.infra01-lb.wdc07.techzone.ibm.com/project/issues?id=order-service-jordanbond-1792604970">All Issues →</a>
+     | 
+    <a href="https://sonarqube-sonarqube.apps.itz-y6rg5f.infra01-lb.wdc07.techzone.ibm.com/security_hotspots?id=order-service-jordanbond-1792604970">Security Hotspots →</a>
+  </p>
+
+  <div class="footer">Made with IBM Bob</div>
+</div>
+</body>
+</html>

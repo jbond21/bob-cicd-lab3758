@@ -1,0 +1,296 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Updated Security Analysis Lab Steps - Bob Findings</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f7f8fa;
+      --border: #e5e7eb;
+      --text: #1f2328;
+      --muted: #57606a;
+      --accent: #3b82d4;
+      --error-bg: #ffebe9;
+      --error-text: #cf222e;
+      --warn-bg: #fff8c5;
+      --warn-text: #9a6700;
+      --info-bg: #ddf4ff;
+      --info-text: #0969da;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 32px 16px;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-error { background: var(--error-bg); color: var(--error-text); }
+    .badge-warn { background: var(--warn-bg); color: var(--warn-text); }
+    .badge-info { background: var(--info-bg); color: var(--info-text); }
+    
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .section-card h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    ol.steps {
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+    ol.steps > li {
+      margin-bottom: 14px;
+    }
+    .finding-group {
+      margin-top: 10px;
+    }
+    .finding-item {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin-top: 8px;
+    }
+    .finding-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .file-ref {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--accent);
+      font-size: 12px;
+    }
+    .finding-desc {
+      color: var(--text);
+      font-size: 13px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+      background: #ffffff;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: var(--surface);
+      font-weight: 600;
+    }
+    .note-box {
+      border-left: 3px solid var(--accent);
+      background: #ffffff;
+      padding: 12px 14px;
+      margin-top: 12px;
+      font-size: 13px;
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Updated Lab Steps: Security &amp; Code Analysis</h1>
+    <p class="subtitle">Replacement content for Bob Findings sections in <code>labs/lab3/SECURITY_ANALYSIS.md</code> based on current branch diff review.</p>
+
+    
+    <div class="section-card">
+      <h2>Replacement for Part 1 (Steps 14–17)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Review the Bob Findings panel</strong> after applying changes or inspecting the diff.
+          <div class="note-box">
+            <strong>Note:</strong> You should see <strong>13 findings</strong> (5 Errors, 5 Warnings, 3 Info items) categorized across your source files, build configuration, and pipeline scripts.
+          </div>
+        </li>
+        <li>
+          <strong>Examine the categorized findings:</strong>
+          
+          <div class="finding-group">
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-error">Error</span>
+                <span class="file-ref">OrderService.java:70-71</span>
+              </div>
+              <div class="finding-desc"><strong>Bypassed Business Logic:</strong> <code>validateStatusTransition</code> is empty, allowing arbitrary status jumps that break lifecycle constraints and transition unit tests.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-error">Error</span>
+                <span class="file-ref">OrderService.java:19-20</span>
+              </div>
+              <div class="finding-desc"><strong>Hardcoded Secrets:</strong> <code>BACKUP_DB_PASSWORD</code> and <code>LEGACY_API_KEY</code> credentials stored directly in source code.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-error">Error</span>
+                <span class="file-ref">OrderService.java:90-107</span>
+              </div>
+              <div class="finding-desc"><strong>Weak Cryptography &amp; Unhandled Exception:</strong> Insecure MD5 hashing algorithm combined with secret key concatenation; catches exception via <code>printStackTrace()</code> and returns null.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-error">Error</span>
+                <span class="file-ref">OrderService.java:124-139</span>
+              </div>
+              <div class="finding-desc"><strong>Sensitive Data Exposure:</strong> Customer name and payment amount exposed in exception messages; raw API key printed to stdout.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-error">Error</span>
+                <span class="file-ref">pom.xml:65-69, 92-97</span>
+              </div>
+              <div class="finding-desc"><strong>Vulnerable Dependency (Log4Shell):</strong> Insecure <code>log4j-core</code> version <code>2.14.1</code> (CVE-2021-44228) included in dependencies and Checkstyle plugin configuration.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-warn">Warning</span>
+                <span class="file-ref">OrderService.java:46-48</span>
+              </div>
+              <div class="finding-desc"><strong>Insecure Logging:</strong> Standard logger replaced with raw <code>System.out.println</code>, printing unformatted customer data to standard output.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-warn">Warning</span>
+                <span class="file-ref">OrderService.java:115-119</span>
+              </div>
+              <div class="finding-desc"><strong>Weak PRNG &amp; Negative Value Risk:</strong> Uses non-cryptographic <code>java.util.Random</code>; <code>Math.abs(Long.MIN_VALUE)</code> remains negative, risking malformed tracking IDs.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-warn">Warning</span>
+                <span class="file-ref">OrderServiceTest.java:48</span>
+              </div>
+              <div class="finding-desc"><strong>Broken Unit Test:</strong> Test mocks a single order but asserts a collection size of 2, guaranteeing test suite failure.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-warn">Warning</span>
+                <span class="file-ref">Jenkinsfile:139-143, 218-222</span>
+              </div>
+              <div class="finding-desc"><strong>Pipeline Scripting Defects:</strong> Use of bash-only <code>${PIPESTATUS[0]}</code> under default shell; Bob command uses deprecated flags and skips cleanup on failure.</div>
+            </div>
+
+            <div class="finding-item">
+              <div class="finding-header">
+                <span class="badge badge-info">Info</span>
+                <span class="file-ref">.bob/mcp.json &amp; Docs</span>
+              </div>
+              <div class="finding-desc"><strong>Local State &amp; Duplicate Commits:</strong> Committed local URL/auth token in MCP config; duplicate issue report HTML/MD files committed across repository.</div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <strong>Understanding the Findings Scope Table:</strong>
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Count</th>
+                <th>Primary Impact</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Security &amp; Secrets</strong></td>
+                <td>5</td>
+                <td>Hardcoded credentials, Log4Shell CVE-2021-44228, MD5 usage, credential leaking</td>
+              </tr>
+              <tr>
+                <td><strong>Code Quality &amp; Logic</strong></td>
+                <td>3</td>
+                <td>Empty transition validation, raw stdout logging, weak PRNG</td>
+              </tr>
+              <tr>
+                <td><strong>Tests &amp; Pipeline</strong></td>
+                <td>3</td>
+                <td>Failing unit test assertion, PIPESTATUS shell mismatch, CLI flag deprecation</td>
+              </tr>
+              <tr>
+                <td><strong>Configuration &amp; Hygiene</strong></td>
+                <td>2</td>
+                <td>Local MCP auth tokens committed, duplicate documentation files</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>
+    </div>
+
+    
+    <div class="section-card">
+      <h2>Replacement for Part 2 (Step 12 Summary)</h2>
+      <p style="margin-bottom:10px">Replace Step 12's summary comparison to reflect the updated findings breakdown:</p>
+      <ul style="padding-left:20px;font-size:13px">
+        <li>🔍 <strong>Real-time Detection</strong>: Bob Findings surfaces 13 targeted issues across code, security, tests, and pipeline files.</li>
+        <li>🛡️ <strong>Holistic Audit</strong>: Software Security Reviewer mode performs deep compliance (OWASP Top 10, PCI-DSS) and architecture-wide posture scanning.</li>
+        <li>⚡ <strong>Immediate Developer Remediation</strong>: Rapidly fix code flaws, broken tests, and dependency vulnerabilities prior to running full pipeline scans.</li>
+      </ul>
+    </div>
+
+    <footer>Made with IBM Bob</footer>
+  </div>
+</body>
+</html>

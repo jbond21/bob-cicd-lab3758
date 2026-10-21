@@ -1,0 +1,200 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Issue: --chat-mode rejected in pipeline bob container</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f2328;
+    background: #ffffff;
+    padding: 32px 16px 64px;
+  }
+  .page { max-width: 760px; margin: 0 auto; }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1f2328;
+  }
+  h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 28px 0 8px;
+    color: #1f2328;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 4px;
+  }
+  p { margin-bottom: 10px; }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 24px;
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 16px 0 0;
+    font-size: 13px;
+  }
+  .meta-row { display: contents; }
+  .meta-label { color: #57606a; }
+  .meta-value { font-weight: 500; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-unstable { background: #fff3cd; color: #856404; }
+  .badge-unconfirmed { background: #f7f8fa; color: #57606a; border: 1px solid #e5e7eb; }
+  .badge-nochange { background: #d1fae5; color: #065f46; }
+
+  pre, code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 12.5px;
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+  }
+  pre {
+    padding: 12px 14px;
+    overflow-x: auto;
+    margin: 8px 0 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  code { padding: 1px 5px; }
+
+  ul, ol {
+    padding-left: 22px;
+    margin-bottom: 10px;
+  }
+  li { margin-bottom: 4px; }
+
+  .callout {
+    border-left: 3px solid #3b82d4;
+    background: #f0f6ff;
+    padding: 10px 14px;
+    border-radius: 0 4px 4px 0;
+    margin: 10px 0 14px;
+    font-size: 13px;
+    color: #1f2328;
+  }
+  .callout.warn {
+    border-left-color: #d97706;
+    background: #fffbeb;
+  }
+  .callout.success {
+    border-left-color: #16a34a;
+    background: #f0fdf4;
+  }
+
+  .section-note {
+    font-size: 13px;
+    color: #57606a;
+    margin-top: 6px;
+  }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 12px;
+    color: #57606a;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Issue: <code>bob --chat-mode</code> rejected in the pipeline's <code>bob</code> container (Lab 1)</h1>
+
+  <div class="meta-grid">
+    <span class="meta-label">Reported by</span>      <span class="meta-value">user39</span>
+    <span class="meta-label">Branch / commit</span>   <span class="meta-value"><code>user39-labs</code> / <code>7e1a677</code></span>
+    <span class="meta-label">Jenkins job</span>       <span class="meta-value"><code>user39/user39-pipeline</code>, build #3</span>
+    <span class="meta-label">Result</span>            <span class="meta-value"><span class="badge badge-unstable">UNSTABLE</span> (expected SUCCESS)</span>
+  </div>
+
+  <h2>Summary</h2>
+  <p>
+    The <strong>PR Review</strong> stage fails because the <code>bob</code> CLI inside the pipeline's
+    <code>bob</code> container (<code>image-registry.openshift-image-registry.svc:5000/jenkins/bob-cli:latest</code>)
+    does not recognise the <code>--chat-mode</code> option. The same option is accepted by a current Bob Shell
+    installed locally (version <strong>1.0.4</strong>). The pipeline code appears to be correct; the
+    <code>bob-cli:latest</code> image is the likely cause.
+  </p>
+
+  <h2>What Happened</h2>
+  <p>The <code>askBob</code> helper runs:</p>
+  <pre>bob --chat-mode pipeline-git-diff-overview -p "Read git-diff.txt and produce the senior-developer PR overview." --hide-intermediary-output</pre>
+
+  <p>Console output from build #3:</p>
+  <pre>+ bob --chat-mode pipeline-git-diff-overview -p Read git-diff.txt and produce the senior-developer PR overview. --hide-intermediary-output
+error: Invalid argument — unknown option '--chat-mode'
+Run `bob --help` for usage.
+Fatal error: error: unknown option '--chat-mode'
+ERROR: script returned exit code 1
+Setting overall build result to UNSTABLE</pre>
+
+  <div class="callout warn">
+    The <code>PR Review</code> stage wraps the Bob call in
+    <code>catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE')</code>, so the Bob failure marks the
+    build <strong>UNSTABLE</strong> rather than failing it outright. Because Bob never ran,
+    <code>bob-pr-review.md</code> was not created and nothing was archived.
+  </div>
+
+  <h2>Evidence</h2>
+  <p>Local Bob Shell — <code>bob --version</code> → <strong>1.0.4</strong>. <code>bob --help</code> lists:</p>
+  <pre>--chat-mode   the mode to use for interaction, must be one of: 'plan', 'code',
+              'advanced', 'ask', 'CCP', 'code-reviewer', 'documentation-writer',
+              'mode-writer', 'code-analyzer', 'zdocs', 'trust-control-auditor',
+              'rules-writer', 'wxo-agent-architect', 'jenkins-bob-integration',
+              'pipeline-git-diff-overview'</pre>
+
+  <ul>
+    <li><code>--chat-mode</code> is a valid option locally, and <code>pipeline-git-diff-overview</code> is an accepted value.</li>
+    <li><code>-p/--prompt</code> is marked deprecated in 1.0.4 ("Use the positional prompt instead"). It still works today but will be removed in a future version.</li>
+    <li>The Bob Shell docs also still document <code>--chat-mode</code>.</li>
+  </ul>
+
+  <h2>Likely Cause</h2>
+  <div class="callout warn">
+    The <code>bob</code> binary in <code>bob-cli:latest</code> is a different (probably older) build than the
+    Bob Shell 1.0.4 used locally. <span class="badge badge-unconfirmed">Not yet confirmed</span> — the version
+    inside the image has not been checked.
+  </div>
+
+  <h2>How to Confirm</h2>
+  <p>Run one of the following and compare with <strong>1.0.4</strong>:</p>
+  <pre>oc run bob-help --rm -it \
+  --image=image-registry.openshift-image-registry.svc:5000/jenkins/bob-cli:latest \
+  -- bob --version</pre>
+  <p>Or add a temporary step to the pipeline:</p>
+  <pre>container('bob') { sh 'bob --version; bob --help' }</pre>
+
+  <h2>Requested Action for the Instructor</h2>
+  <ol>
+    <li>Check the Bob Shell version in <code>bob-cli:latest</code> and rebuild or refresh the image with a current Bob Shell if it is out of date.</li>
+    <li>Confirm whether other participants see the same <code>unknown option '--chat-mode'</code> error in Lab 1.</li>
+  </ol>
+
+  <h2>Status of the Pipeline Code</h2>
+  <div class="callout success">
+    <span class="badge badge-nochange">No change needed</span>  No <code>Jenkinsfile</code> change is required if the image is updated.
+    After the image is fixed, re-run the build; the <strong>PR Review</strong> stage should complete and archive <code>bob-pr-review.md</code>.
+  </div>
+
+  <footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>
