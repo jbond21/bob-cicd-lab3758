@@ -14,29 +14,6 @@
 // Before running: if your OpenShift project is NOT named `jenkins`,
 // update the `bob` container image URL below.
 // ═══════════════════════════════════════════════════════════════════
-// ── Helper: ask Bob, optionally with a specific custom mode ───────────────────
-// Writes the prompt to a tempfile in the shared workspace and runs `bob` in
-// the bob container, adding `--chat-mode <slug>` only when a mode is provided.
-// Returns the analysis as a string. Using a tempfile (instead of inlining the
-// prompt on the command line) avoids shell-escaping issues when the prompt
-// contains quotes, backticks, or newlines — common with diffs.
-def askBob(String prompt, String mode = null) {
-    container('bob') {
-        def promptFile = ".bob-prompt-${System.currentTimeMillis()}.txt"
-        writeFile file: promptFile, text: prompt
-
-        def modeFlag = mode ? "--chat-mode ${mode}" : ""
-        def analysis = sh(
-            script: """bob ${modeFlag} -p "\$(cat ${promptFile})" --hide-intermediary-output""",
-            returnStdout: true
-        ).trim()
-
-        sh "rm -f ${promptFile}"
-        return analysis
-    }
-}
-
-
 pipeline {
     agent {
         kubernetes {
@@ -172,5 +149,27 @@ spec:
             echo "=== Pipeline Complete ==="
             echo "Result: ${currentBuild.result ?: 'SUCCESS'}"
         }
+    }
+}
+
+// ── Helper: ask Bob, optionally with a specific custom mode ───────────────────
+// Writes the prompt to a tempfile in the shared workspace and runs `bob` in
+// the bob container, adding `--chat-mode <slug>` only when a mode is provided.
+// Returns the analysis as a string. Using a tempfile (instead of inlining the
+// prompt on the command line) avoids shell-escaping issues when the prompt
+// contains quotes, backticks, or newlines — common with diffs.
+def askBob(String prompt, String mode = null) {
+    container('bob') {
+        def promptFile = ".bob-prompt-${System.currentTimeMillis()}.txt"
+        writeFile file: promptFile, text: prompt
+
+        def modeFlag = mode ? "--chat-mode ${mode}" : ""
+        def analysis = sh(
+            script: """bob ${modeFlag} -p "\$(cat ${promptFile})" --hide-intermediary-output""",
+            returnStdout: true
+        ).trim()
+
+        sh "rm -f ${promptFile}"
+        return analysis
     }
 }
